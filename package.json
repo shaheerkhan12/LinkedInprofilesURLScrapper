@@ -16,8 +16,5 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/your-username/linkedin-profile-scraper"
-  },
-  "apify": {
-    "actId": "your-actor-id"
   }
 }
