@@ -10,8 +10,8 @@
   "author": "Your Name",
   "license": "ISC",
   "dependencies": {
-    "apify": "^3.0.0",
-    "puppeteer": "^21.0.0"
+    "apify": "^3.1.10",
+    "puppeteer": "^24.15.0"
   },
   "repository": {
     "type": "git",
