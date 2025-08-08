@@ -1,6 +1,6 @@
-const Apify = require('apify');
+const { Actor } = require('apify');
 
-Apify.main(async () => {
+Actor.main(async () => {
     // Get input data from Apify console
     const input = await Apify.getInput();
     
