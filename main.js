@@ -121,6 +121,7 @@ Actor.main(async () => {
                     waitUntil: 'networkidle0',
                     timeout: 40000 
                 });
+                await delay(1000);
 
                 // Wait for search results to load
                 await page.waitForSelector('#search', { timeout: 10000 }).catch(() => {
