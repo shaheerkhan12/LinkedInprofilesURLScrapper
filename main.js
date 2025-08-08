@@ -2,7 +2,7 @@ const { Actor } = require('apify');
 
 Actor.main(async () => {
     // Get input data from Apify console
-    const input = await Apify.getInput();
+    const input = await Actor.getInput();
     
     // Validate input
     const {
@@ -24,16 +24,16 @@ Actor.main(async () => {
     });
 
     // Initialize dataset to store results
-    const dataset = await Apify.openDataset();
+    const dataset = await Actor.openDataset();
     
     // Set up proxy configuration
-    const proxyConfig = useApifyProxy ? await Apify.createProxyConfiguration({
+    const proxyConfig = useApifyProxy ? await Actor.createProxyConfiguration({
         groups: [proxyGroup],
         useApifyProxy: true
     }) : undefined;
 
     // Launch Puppeteer with Apify configuration
-    const browser = await Apify.launchPuppeteer({
+    const browser = await Actor.launchPuppeteer({
         proxyConfiguration: proxyConfig,
         useChrome: true,
         launchOptions: {
@@ -246,7 +246,7 @@ Actor.main(async () => {
         console.log(`Crawling completed! Found ${foundUrls.size} unique LinkedIn profiles.`);
         
         // Save summary to key-value store
-        await Apify.setValue('SUMMARY', {
+        await Actor.setValue('SUMMARY', {
             totalProfiles: foundUrls.size,
             profession,
             country,
