@@ -5,20 +5,32 @@ Actor.main(async () => {
     // Get input data from Apify console
     const input = await Actor.getInput();
     
-    // Validate input
-    const {
+  const {
         profession = 'software engineer',
         country = 'United States',
         maxPages = 10,
-        delayMs = 2000
+        delayMs = 2000,
+        useApifyProxy = true,
+        proxyGroup = 'RESIDENTIAL'
     } = input;
 
     console.log('Starting LinkedIn Profile Scraper', {
         profession,
         country,
         maxPages,
-        delayMs
+        delayMs,
+        useApifyProxy,
+        proxyGroup
     });
+
+    // Initialize dataset to store results
+    const dataset = await Actor.openDataset();
+    
+    // Set up proxy configuration
+    const proxyConfig = useApifyProxy ? await Actor.createProxyConfiguration({
+        groups: [proxyGroup],
+        useApifyProxy: true
+    }) : undefined;
 
     const foundUrls = new Set();
     const query = `site:linkedin.com/in "${profession}" "${country}"`;
