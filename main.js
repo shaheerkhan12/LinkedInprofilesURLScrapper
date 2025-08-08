@@ -124,7 +124,7 @@ Actor.main(async () => {
                 await delay(2000);
 
                 // Wait for search results to load
-                await page.waitForSelector('#search', { timeout: 10000 }).catch(() => {
+                await page.waitForSelector('#search', { timeout: 20000 }).catch(() => {
                     console.log('Search results container not found, continuing...');
                 });
 
