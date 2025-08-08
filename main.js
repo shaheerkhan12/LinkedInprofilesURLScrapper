@@ -1,5 +1,4 @@
 const Apify = require('apify');
-const { log } = Apify.utils;
 
 Apify.main(async () => {
     // Get input data from Apify console
@@ -15,7 +14,7 @@ Apify.main(async () => {
         proxyGroup = 'RESIDENTIAL'
     } = input;
 
-    log.info('Starting LinkedIn Profile Scraper', {
+    console.log('Starting LinkedIn Profile Scraper', {
         profession,
         country,
         maxPages,
@@ -54,7 +53,7 @@ Apify.main(async () => {
     const foundUrls = new Set();
     const query = `site:linkedin.com/in "${profession}" "${country}"`;
     
-    log.info(`Search query: ${query}`);
+    console.log(`Search query: ${query}`);
 
     try {
         const page = await browser.newPage();
@@ -100,7 +99,7 @@ Apify.main(async () => {
             const start = pageNum * 10;
             const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}&start=${start}`;
             
-            log.info(`Crawling page ${pageNum + 1}/${maxPages}`, { url: searchUrl });
+            console.log(`Crawling page ${pageNum + 1}/${maxPages}: ${searchUrl}`);
             
             try {
                 // First visit to establish session
@@ -109,7 +108,7 @@ Apify.main(async () => {
                         waitUntil: 'networkidle0',
                         timeout: 40000 
                     });
-                    await Apify.utils.sleep(1000);
+                    await page.waitFor(1000);
                 }
                 
                 // Navigate to search page
@@ -120,13 +119,13 @@ Apify.main(async () => {
 
                 // Wait for search results
                 await page.waitForSelector('#search', { timeout: 10000 }).catch(() => {
-                    log.warning('Search results container not found, continuing...');
+                    console.log('Search results container not found, continuing...');
                 });
 
-                await Apify.utils.sleep(3000);
+                await page.waitFor(3000);
 
                 // Extract LinkedIn URLs from the page
-                log.info('Extracting LinkedIn URLs...');
+                console.log('Extracting LinkedIn URLs...');
                 
                 const pageUrls = await page.evaluate(() => {
                     const selectors = [
@@ -183,7 +182,7 @@ Apify.main(async () => {
                 const allUrls = [...pageUrls, ...regexMatches];
                 const uniquePageUrls = [...new Set(allUrls)];
                 
-                log.info(`Found ${uniquePageUrls.length} LinkedIn URLs on page ${pageNum + 1}`);
+                console.log(`Found ${uniquePageUrls.length} LinkedIn URLs on page ${pageNum + 1}`);
                 
                 // Save each URL to dataset
                 for (const url of uniquePageUrls) {
@@ -199,7 +198,7 @@ Apify.main(async () => {
                             timestamp: new Date().toISOString()
                         });
                         
-                        log.info(`Added profile: ${url}`);
+                        console.log(`Added profile: ${url}`);
                     }
                 }
 
@@ -211,37 +210,40 @@ Apify.main(async () => {
                     return !!nextButton;
                 });
 
-                log.info(`Total unique URLs found: ${foundUrls.size}, Has next page: ${hasNextPage}`);
+                console.log(`Total unique URLs found: ${foundUrls.size}, Has next page: ${hasNextPage}`);
 
                 if (!hasNextPage && pageNum < maxPages - 1) {
-                    log.info('No more pages available, stopping early');
+                    console.log('No more pages available, stopping early');
                     break;
                 }
                 
                 // Add delay between requests
                 if (pageNum < maxPages - 1) {
-                    log.info(`Waiting ${delayMs}ms before next request...`);
-                    await Apify.utils.sleep(delayMs);
+                    console.log(`Waiting ${delayMs}ms before next request...`);
+                    await page.waitFor(delayMs);
                 }
 
             } catch (error) {
-                log.error(`Error on page ${pageNum + 1}`, { error: error.message });
+                console.error(`Error on page ${pageNum + 1}:`, error.message);
                 
                 // Take screenshot for debugging
                 try {
                     const key = `error-page-${pageNum + 1}.png`;
-                    await Apify.utils.puppeteer.saveSnapshot(page, { key });
-                    log.info(`Screenshot saved: ${key}`);
+                    await page.screenshot({ 
+                        path: key,
+                        fullPage: true 
+                    });
+                    console.log(`Screenshot saved: ${key}`);
                 } catch (screenshotError) {
-                    log.error('Could not take screenshot', { error: screenshotError.message });
+                    console.error('Could not take screenshot:', screenshotError.message);
                 }
                 
                 // Wait longer on error
-                await Apify.utils.sleep(delayMs * 2);
+                await page.waitFor(delayMs * 2);
             }
         }
 
-        log.info(`Crawling completed! Found ${foundUrls.size} unique LinkedIn profiles.`);
+        console.log(`Crawling completed! Found ${foundUrls.size} unique LinkedIn profiles.`);
         
         // Save summary to key-value store
         await Apify.setValue('SUMMARY', {
@@ -254,7 +256,7 @@ Apify.main(async () => {
         });
 
     } catch (error) {
-        log.error('Crawling failed', { error: error.message });
+        console.error('Crawling failed:', error.message);
         throw error;
     } finally {
         if (browser) {
