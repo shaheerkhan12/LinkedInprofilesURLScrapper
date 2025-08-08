@@ -1,0 +1,61 @@
+{
+  "title": "LinkedIn Profile Scraper Configuration",
+  "description": "Configure the parameters for scraping LinkedIn profiles from Google search results",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "profession": {
+      "title": "Profession/Job Title",
+      "type": "string",
+      "description": "The profession or job title to search for (e.g., 'software engineer', 'marketing manager', 'data scientist')",
+      "default": "software engineer",
+      "editor": "textfield",
+      "example": "software engineer"
+    },
+    "country": {
+      "title": "Country",
+      "type": "string", 
+      "description": "The country to search for profiles in (e.g., 'United States', 'Canada', 'United Kingdom')",
+      "default": "United States",
+      "editor": "textfield",
+      "example": "United States"
+    },
+    "maxPages": {
+      "title": "Maximum Search Pages",
+      "type": "integer",
+      "description": "Maximum number of Google search result pages to crawl (each page contains ~10 results)",
+      "default": 10,
+      "minimum": 1,
+      "maximum": 50,
+      "editor": "number"
+    },
+    "delayMs": {
+      "title": "Delay Between Requests (ms)",
+      "type": "integer",
+      "description": "Delay in milliseconds between each page request to avoid being blocked by Google",
+      "default": 2000,
+      "minimum": 1000,
+      "maximum": 10000,
+      "editor": "number"
+    },
+    "useApifyProxy": {
+      "title": "Use Apify Proxy",
+      "type": "boolean",
+      "description": "Use Apify's proxy service for better success rates and to avoid IP blocking",
+      "default": true,
+      "editor": "checkbox"
+    },
+    "proxyGroups": {
+      "title": "Proxy Groups",
+      "type": "array",
+      "description": "Which Apify proxy groups to use. RESIDENTIAL is recommended for better success with Google",
+      "items": {
+        "type": "string",
+        "enum": ["RESIDENTIAL", "DATACENTER"]
+      },
+      "default": ["RESIDENTIAL"],
+      "editor": "stringList"
+    }
+  },
+  "required": ["profession", "country"]
+}

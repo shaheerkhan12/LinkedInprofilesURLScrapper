@@ -2,107 +2,26 @@
   "actorSpecification": 1,
   "name": "linkedin-profile-scraper",
   "title": "LinkedIn Profile Scraper",
-  "description": "Scrape LinkedIn profiles from Google search results based on profession and country criteria. Finds public LinkedIn profile URLs without accessing private data.",
-  "version": "1.0.0",
+  "description": "Scrapes LinkedIn profile URLs from Google search results based on profession and country criteria. Finds public LinkedIn profile URLs without accessing private data.",
+  "version": "1.0",
   "meta": {
-    "templateId": "node-puppeteer"
+    "templateId": "node_puppeteer"
   },
+  "input": "./INPUT_SCHEMA.json",
   "dockerfile": "./Dockerfile",
-  "input": {
-    "title": "LinkedIn Profile Scraper Configuration",
-    "description": "Configure the parameters for scraping LinkedIn profiles from Google search results",
-    "type": "object",
-    "schemaVersion": 1,
-    "properties": {
-      "profession": {
-        "title": "Profession/Job Title",
-        "type": "string",
-        "description": "The profession or job title to search for (e.g., 'software engineer', 'marketing manager', 'data scientist')",
-        "default": "software engineer",
-        "editor": "textfield",
-        "example": "software engineer"
-      },
-      "country": {
-        "title": "Country",
-        "type": "string",
-        "description": "The country to search for profiles in (e.g., 'United States', 'Canada', 'United Kingdom')",
-        "default": "United States",
-        "editor": "textfield",
-        "example": "United States"
-      },
-      "maxPages": {
-        "title": "Maximum Search Pages",
-        "type": "integer",
-        "description": "Maximum number of Google search result pages to crawl (each page contains ~10 results)",
-        "default": 10,
-        "minimum": 1,
-        "maximum": 50,
-        "editor": "number"
-      },
-      "delayMs": {
-        "title": "Delay Between Requests (ms)",
-        "type": "integer",
-        "description": "Delay in milliseconds between each page request to avoid being blocked by Google",
-        "default": 2000,
-        "minimum": 1000,
-        "maximum": 10000,
-        "editor": "number"
-      },
-      "useApifyProxy": {
-        "title": "Use Apify Proxy",
-        "type": "boolean",
-        "description": "Use Apify's proxy service for better success rates and to avoid IP blocking",
-        "default": true,
-        "editor": "checkbox"
-      },
-      "proxyGroups": {
-        "title": "Proxy Groups",
-        "type": "array",
-        "description": "Which Apify proxy groups to use. RESIDENTIAL is recommended for better success with Google",
-        "items": {
-          "type": "string",
-          "enum": ["RESIDENTIAL", "DATACENTER"]
-        },
-        "default": ["RESIDENTIAL"],
-        "editor": "stringList"
-      }
-    },
-    "required": ["profession", "country"]
+  "readme": "./README.md",
+  "categories": ["BUSINESS", "LEAD_GENERATION"],
+  "defaultRunOptions": {
+    "build": "latest",
+    "timeoutSecs": 3600,
+    "memoryMbytes": 2048
   },
-  "storages": {
-    "dataset": {
-      "actorSpecification": 1,
-      "title": "LinkedIn Profiles",
-      "description": "Dataset containing found LinkedIn profile URLs with metadata",
-      "views": {
-        "overview": {
-          "title": "Overview",
-          "transformation": {
-            "fields": [
-              "url",
-              "profession",
-              "country",
-              "foundOnPage",
-              "timestamp"
-            ]
-          }
-        },
-        "profiles": {
-          "title": "Profile URLs Only",
-          "transformation": {
-            "fields": ["url"]
-          }
-        }
-      }
-    }
-  },
-  "platform": "linux/amd64",
-  "categories": [
-    "BUSINESS",
-    "LEAD_GENERATION"
-  ],
-  "isPublic": false,
-  "seoTitle": "LinkedIn Profile Scraper - Find Professional Profiles by Job Title and Location",
-  "seoDescription": "Efficiently scrape LinkedIn profile URLs from Google search results. Search by profession and country to build targeted lead lists for business development.",
-  "shortDescription": "Find LinkedIn profiles by profession and country using Google search results"
+  "example": {
+    "profession": "software engineer",
+    "country": "United States",
+    "maxPages": 5,
+    "delayMs": 3000,
+    "useApifyProxy": true,
+    "proxyGroups": ["RESIDENTIAL"]
+  }
 }

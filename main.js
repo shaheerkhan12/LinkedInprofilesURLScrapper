@@ -11,21 +11,27 @@ Apify.main(async () => {
         country = 'United States',
         maxPages = 10,
         delayMs = 2000,
-        proxyConfiguration
+        useApifyProxy = true,
+        proxyGroups = ['RESIDENTIAL']
     } = input;
 
     log.info('Starting LinkedIn Profile Scraper', {
         profession,
         country,
         maxPages,
-        delayMs
+        delayMs,
+        useApifyProxy,
+        proxyGroups
     });
 
     // Initialize dataset to store results
     const dataset = await Apify.openDataset();
     
     // Set up proxy configuration
-    const proxyConfig = await Apify.createProxyConfiguration(proxyConfiguration);
+    const proxyConfig = useApifyProxy ? await Apify.createProxyConfiguration({
+        groups: proxyGroups,
+        useApifyProxy: true
+    }) : undefined;
 
     // Launch Puppeteer with Apify configuration
     const browser = await Apify.launchPuppeteer({
