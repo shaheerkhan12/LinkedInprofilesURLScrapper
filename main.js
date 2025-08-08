@@ -1,4 +1,5 @@
 const { Actor } = require('apify');
+const puppeteer = require('puppeteer');
 
 Actor.main(async () => {
     // Get input data from Apify console
@@ -33,11 +34,11 @@ Actor.main(async () => {
     }) : undefined;
 
     // Launch Puppeteer with Apify configuration
-    const browser = await Actor.launchPuppeteer({
-        proxyConfiguration: proxyConfig,
-        useChrome: true,
-        launchOptions: {
+    let browser;
+    try {
+        browser = await puppeteer.launch({
             headless: true,
+            defaultViewport: null,
             args: [
                 '--no-sandbox',
                 '--disable-setuid-sandbox',
@@ -47,8 +48,11 @@ Actor.main(async () => {
                 '--disable-features=VizDisplayCompositor',
                 '--window-size=1920,1080'
             ]
-        }
-    });
+        });
+    } catch (error) {
+        console.error('Failed to launch browser:', error);
+        throw error;
+    }
 
     const foundUrls = new Set();
     const query = `site:linkedin.com/in "${profession}" "${country}"`;
@@ -94,6 +98,9 @@ Actor.main(async () => {
             'upgrade-insecure-requests': '1'
         });
 
+        // Delay function (proper async/await version)
+        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
         // Crawl multiple pages
         for (let pageNum = 0; pageNum < maxPages; pageNum++) {
             const start = pageNum * 10;
@@ -108,7 +115,7 @@ Actor.main(async () => {
                         waitUntil: 'networkidle0',
                         timeout: 40000 
                     });
-                    await page.waitFor(1000);
+                    await delay(1000);
                 }
                 
                 // Navigate to search page
@@ -118,11 +125,13 @@ Actor.main(async () => {
                 });
 
                 // Wait for search results
-                await page.waitForSelector('#search', { timeout: 10000 }).catch(() => {
+                try {
+                    await page.waitForSelector('#search', { timeout: 10000 });
+                } catch (error) {
                     console.log('Search results container not found, continuing...');
-                });
+                }
 
-                await page.waitFor(3000);
+                await delay(3000);
 
                 // Extract LinkedIn URLs from the page
                 console.log('Extracting LinkedIn URLs...');
@@ -189,8 +198,8 @@ Actor.main(async () => {
                     if (!foundUrls.has(url)) {
                         foundUrls.add(url);
                         
-                        // Save to Apify dataset
-                        await dataset.pushData({
+                        // Save to Apify dataset using pushData (fixed from dataset.pushData)
+                        await Actor.pushData({
                             url,
                             profession,
                             country,
@@ -220,26 +229,27 @@ Actor.main(async () => {
                 // Add delay between requests
                 if (pageNum < maxPages - 1) {
                     console.log(`Waiting ${delayMs}ms before next request...`);
-                    await page.waitFor(delayMs);
+                    await delay(delayMs);
                 }
 
             } catch (error) {
                 console.error(`Error on page ${pageNum + 1}:`, error.message);
                 
-                // Take screenshot for debugging
+                // Take screenshot for debugging (save to key-value store instead)
                 try {
-                    const key = `error-page-${pageNum + 1}.png`;
-                    await page.screenshot({ 
-                        path: key,
-                        fullPage: true 
+                    const screenshot = await page.screenshot({ 
+                        fullPage: true,
+                        type: 'png'
                     });
+                    const key = `error-page-${pageNum + 1}.png`;
+                    await Actor.setValue(key, screenshot, { contentType: 'image/png' });
                     console.log(`Screenshot saved: ${key}`);
                 } catch (screenshotError) {
                     console.error('Could not take screenshot:', screenshotError.message);
                 }
                 
                 // Wait longer on error
-                await page.waitFor(delayMs * 2);
+                await delay(delayMs * 2);
             }
         }
 
