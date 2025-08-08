@@ -27,7 +27,7 @@ Actor.main(async () => {
     const foundUrls = new Set();
     const query = `site:linkedin.com/in "${profession}" "${country}"`;
     
-    // console.log(`Search query: ${query}`);
+    console.log(`Search query: ${query}`);
 
     // Set up proxy configuration for better success rate
     const proxyConfiguration = useProxy ? await Actor.createProxyConfiguration({
@@ -192,14 +192,14 @@ Actor.main(async () => {
                     searchUrl = `${searchEngine.baseUrl}?${searchEngine.param}=${encodeURIComponent(query)}&first=${first}`;
                 }
                 
-                // console.log(`\n=== Crawling ${searchEngine.name} page ${pageNum + 1}/${maxPages} ===`);
-                // console.log(`URL: ${searchUrl}`);
+                console.log(`\n=== Crawling ${searchEngine.name} page ${pageNum + 1}/${maxPages} ===`);
+                console.log(`URL: ${searchUrl}`);
                 
                 try {
                     // First visit to establish session
                     if (pageNum === 0) {
                         const homeUrl = searchEngine.name === 'Google' ? 'https://www.google.com' : 'https://www.bing.com';
-                        // console.log(`Visiting ${homeUrl} to establish session...`);
+                        console.log(`Visiting ${homeUrl} to establish session...`);
                         await page.goto(homeUrl, { 
                             waitUntil: 'networkidle0',
                             timeout: 30000 
@@ -336,7 +336,7 @@ Actor.main(async () => {
                     
                     console.log(`Found ${uniquePageUrls.length} LinkedIn URLs on this page:`);
                     uniquePageUrls.forEach((url, index) => {
-                        // console.log(`  ${index + 1}. ${url}`);
+                        console.log(`  ${index + 1}. ${url}`);
                     });
                     
                     // Save each URL to dataset
