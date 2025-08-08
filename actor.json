@@ -22,6 +22,6 @@
     "maxPages": 5,
     "delayMs": 3000,
     "useApifyProxy": true,
-    "proxyGroups": ["RESIDENTIAL"]
+    "proxyGroup": "RESIDENTIAL"
   }
 }

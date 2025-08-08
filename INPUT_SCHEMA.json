@@ -45,16 +45,13 @@
       "default": true,
       "editor": "checkbox"
     },
-    "proxyGroups": {
-      "title": "Proxy Groups",
-      "type": "array",
-      "description": "Which Apify proxy groups to use. RESIDENTIAL is recommended for better success with Google",
-      "items": {
-        "type": "string",
-        "enum": ["RESIDENTIAL", "DATACENTER"]
-      },
-      "default": ["RESIDENTIAL"],
-      "editor": "stringList"
+    "proxyGroup": {
+      "title": "Proxy Group",
+      "type": "string",
+      "description": "Which Apify proxy group to use. RESIDENTIAL is recommended for better success with Google",
+      "enum": ["RESIDENTIAL", "DATACENTER"],
+      "default": "RESIDENTIAL",
+      "editor": "select"
     }
   },
   "required": ["profession", "country"]

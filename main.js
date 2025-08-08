@@ -12,7 +12,7 @@ Apify.main(async () => {
         maxPages = 10,
         delayMs = 2000,
         useApifyProxy = true,
-        proxyGroups = ['RESIDENTIAL']
+        proxyGroup = 'RESIDENTIAL'
     } = input;
 
     log.info('Starting LinkedIn Profile Scraper', {
@@ -21,7 +21,7 @@ Apify.main(async () => {
         maxPages,
         delayMs,
         useApifyProxy,
-        proxyGroups
+        proxyGroup
     });
 
     // Initialize dataset to store results
@@ -29,7 +29,7 @@ Apify.main(async () => {
     
     // Set up proxy configuration
     const proxyConfig = useApifyProxy ? await Apify.createProxyConfiguration({
-        groups: proxyGroups,
+        groups: [proxyGroup],
         useApifyProxy: true
     }) : undefined;
 
